@@ -1,0 +1,13 @@
+/bin/
+/tmp/
+/data/
+/target/
+*.exe
+*.test
+*.out
+coverage.out
+.env
+.idea/
+.vscode/
+.DS_Store
+*.iml

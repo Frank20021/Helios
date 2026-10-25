@@ -1,0 +1,99 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "id": 1,
+      "title": "Search latency P50 / P95 / P99",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "helios_search_latency_p50_seconds", "legendFormat": "p50" },
+        { "expr": "helios_search_latency_p95_seconds", "legendFormat": "p95" },
+        { "expr": "helios_search_latency_p99_seconds", "legendFormat": "p99" }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Query throughput",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "rate(helios_search_duration_seconds_count[1m])", "legendFormat": "qps" }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Cache hit rate",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "helios_cache_hits_total / (helios_cache_hits_total + helios_cache_misses_total)", "legendFormat": "hit rate" }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "HTTP errors",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "helios_http_errors_total", "legendFormat": "5xx" }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Shard availability",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "helios_shard_up", "legendFormat": "{{shard_id}}" }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Indexing throughput",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "rate(helios_index_passages_created_total[5m])", "legendFormat": "passages/s" }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Memory",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "helios_process_resident_memory_bytes", "legendFormat": "{{job}}" }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "CPU seconds",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "rate(helios_process_cpu_seconds_total[1m])", "legendFormat": "{{job}}" }
+      ]
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["helios"],
+  "templating": { "list": [] },
+  "time": { "from": "now-15m", "to": "now" },
+  "title": "Helios",
+  "uid": "helios",
+  "version": 1
+}

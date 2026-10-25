@@ -1,0 +1,10 @@
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  - job_name: helios-api
+    static_configs:
+      - targets: ["api:8080"]
+  - job_name: helios-shards
+    static_configs:
+      - targets: ["shard-0:9100", "shard-1:9100", "shard-2:9100"]

@@ -1,0 +1,83 @@
+server:
+  host: "0.0.0.0"
+  port: 8080
+  read_timeout: 15s
+  write_timeout: 15s
+
+database:
+  url: "postgres://helios:helios@localhost:5432/helios?sslmode=disable"
+
+logging:
+  level: info
+  format: json
+
+index:
+  snapshot_path: data/index.json
+  bm25:
+    k1: 1.2
+    b: 0.75
+  tokenizer:
+    min_token_length: 2
+    # Omitted stop_words keep the built-in English list. Set the key to replace it.
+
+crawler:
+  allowed_hosts:
+    - github.com
+  clone_timeout: 120s
+  max_file_size_bytes: 1048576
+  max_repo_size_bytes: 104857600
+  max_files: 5000
+  ignored_directories:
+    - .git
+    - node_modules
+    - vendor
+    - dist
+    - build
+    - target
+    - coverage
+    - __pycache__
+    - .idea
+    - .vscode
+  supported_extensions:
+    - .go
+    - .py
+    - .java
+    - .js
+    - .ts
+    - .tsx
+    - .cpp
+    - .h
+    - .md
+    - .txt
+
+jobs:
+  worker_count: 2
+
+cluster:
+  enabled: false
+  query_timeout: 2s
+  vnode_count: 128
+  replication_factor: 1
+  retry_max: 2
+  retry_base: 20ms
+  health_fail_after: 2
+  shards: []
+
+shard:
+  grpc_host: "0.0.0.0"
+  grpc_port: 9000
+
+search:
+  default_mode: lexical
+  alpha: 0.5
+  embed_dim: 384
+  semantic_candidates: 200
+
+cache:
+  enabled: true
+  backend: memory
+  ttl: 60s
+  redis_url: ""
+
+observability:
+  otlp_endpoint: ""

@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package helios.v1;
+
+option java_package = "io.helios.grpc";
+option java_multiple_files = true;
+option java_outer_classname = "HeliosProto";
+
+
+// IndexShard is the internal RPC a coordinator uses to talk to one shard.
+service IndexShard {
+  rpc Search(SearchRequest) returns (SearchResponse);
+  rpc Apply(ApplyRequest) returns (ApplyResponse);
+  rpc Remove(RemoveRequest) returns (RemoveResponse);
+  rpc Persist(PersistRequest) returns (PersistResponse);
+  rpc Health(HealthRequest) returns (HealthResponse);
+}
+
+message SearchRequest {
+  string query = 1;
+  int32 limit = 2;
+  // primary_id asks the shard for one hash partition (owner shard id).
+  string primary_id = 3;
+}
+
+message Candidate {
+  string passage_id = 1;
+  int32 length = 2;
+  map<string, int32> tf = 3;
+  repeated string matched_terms = 4;
+}
+
+message SearchResponse {
+  int64 passage_count = 1;
+  int64 sum_lengths = 2;
+  map<string, int32> df = 3;
+  repeated Candidate candidates = 4;
+}
+
+message ApplyRequest {
+  string passage_id = 1;
+  string document_id = 2;
+  string text = 3;
+}
+
+message ApplyResponse {}
+
+message RemoveRequest {
+  string passage_id = 1;
+}
+
+message RemoveResponse {}
+
+message PersistRequest {}
+
+message PersistResponse {}
+
+message HealthRequest {}
+
+message HealthResponse {
+  string shard_id = 1;
+  bool ready = 2;
+  int64 passage_count = 3;
+  int64 primary_count = 4;
+}

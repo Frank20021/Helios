@@ -1,0 +1,44 @@
+{
+  "dataset": "testdata/repos/sample",
+  "k": 5,
+  "queries": [
+    {
+      "id": "nl-auth-retry",
+      "text": "Where is authentication failure retry logic implemented?",
+      "relevant": [
+        "internal/auth/retry.go",
+        "README.md",
+        "notes.txt"
+      ]
+    },
+    {
+      "id": "python-retry",
+      "text": "retryAuthentication function in Python",
+      "relevant": [
+        "auth.py"
+      ]
+    },
+    {
+      "id": "java-auth-service",
+      "text": "AuthService Java retry",
+      "relevant": [
+        "AuthService.java"
+      ]
+    },
+    {
+      "id": "cpp-header",
+      "text": "C++ authentication retry header",
+      "relevant": [
+        "retry.h",
+        "retry.cpp"
+      ]
+    },
+    {
+      "id": "failed-login-notes",
+      "text": "failed login retry notes",
+      "relevant": [
+        "notes.txt"
+      ]
+    }
+  ]
+}

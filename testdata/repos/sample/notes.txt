@@ -1,0 +1,3 @@
+This project implements authentication retry for failed logins.
+
+See the Go helper named retryAuthentication.

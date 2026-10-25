@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Helios</title>
+  <link rel="stylesheet" href="/ui/app.css">
+</head>
+<body>
+  <header class="bar">
+    <strong>Helios</strong>
+    <nav>
+      <a href="#search">Search</a>
+      <a href="#repos">Repositories</a>
+      <a href="#status">Status</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="search">
+      <h1>Search</h1>
+      <form id="search-form">
+        <label>Query <input name="q" required placeholder="Where is authentication failure retry logic implemented?"></label>
+        <label>Mode
+          <select name="mode">
+            <option value="lexical">lexical</option>
+            <option value="semantic">semantic</option>
+            <option value="hybrid">hybrid</option>
+          </select>
+        </label>
+        <label>Language <input name="language" placeholder="go"></label>
+        <label>Alpha <input name="alpha" type="number" min="0" max="1" step="0.1" value="0.5"></label>
+        <button type="submit">Search</button>
+      </form>
+      <p id="search-meta" class="muted" hidden></p>
+      <p id="search-error" class="error" hidden></p>
+      <p id="search-loading" hidden>Searching…</p>
+      <ol id="results"></ol>
+    </section>
+
+    <section id="repos">
+      <h1>Repositories</h1>
+      <form id="repo-form">
+        <label>GitHub URL <input name="url" required placeholder="https://github.com/owner/repository"></label>
+        <button type="submit">Index</button>
+      </form>
+      <p id="repo-error" class="error" hidden></p>
+      <p id="job-progress" class="muted" hidden></p>
+      <ul id="repo-list"></ul>
+    </section>
+
+    <section id="status">
+      <h1>System status</h1>
+      <pre id="status-body">Loading…</pre>
+    </section>
+  </main>
+  <script src="/ui/app.js"></script>
+</body>
+</html>

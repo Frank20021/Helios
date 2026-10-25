@@ -1,0 +1,144 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: helios
+      POSTGRES_PASSWORD: helios
+      POSTGRES_DB: helios
+    ports:
+      - "5432:5432"
+    volumes:
+      - helios_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U helios -d helios"]
+      interval: 2s
+      timeout: 5s
+      retries: 20
+
+  shard-0:
+    build:
+      context: .
+      dockerfile: deployments/docker/Dockerfile
+    entrypoint: ["/app/helios-shard"]
+    environment:
+      HELIOS_DATABASE_URL: postgres://helios:helios@postgres:5432/helios?sslmode=disable
+      HELIOS_SHARD_ID: shard-0
+      HELIOS_SHARD_GRPC_HOST: 0.0.0.0
+      HELIOS_SHARD_GRPC_PORT: "9000"
+      HELIOS_CLUSTER_SHARDS: shard-0=shard-0:9000,shard-1=shard-1:9000,shard-2=shard-2:9000
+      HELIOS_CLUSTER_REPLICATION_FACTOR: "2"
+      HELIOS_INDEX_SNAPSHOT_PATH: /app/data/shard-0.json
+      HELIOS_SHARD_METRICS_PORT: "9100"
+    volumes:
+      - helios_shard0:/app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  shard-1:
+    build:
+      context: .
+      dockerfile: deployments/docker/Dockerfile
+    entrypoint: ["/app/helios-shard"]
+    environment:
+      HELIOS_DATABASE_URL: postgres://helios:helios@postgres:5432/helios?sslmode=disable
+      HELIOS_SHARD_ID: shard-1
+      HELIOS_SHARD_GRPC_HOST: 0.0.0.0
+      HELIOS_SHARD_GRPC_PORT: "9000"
+      HELIOS_CLUSTER_SHARDS: shard-0=shard-0:9000,shard-1=shard-1:9000,shard-2=shard-2:9000
+      HELIOS_CLUSTER_REPLICATION_FACTOR: "2"
+      HELIOS_INDEX_SNAPSHOT_PATH: /app/data/shard-1.json
+      HELIOS_SHARD_METRICS_PORT: "9100"
+    volumes:
+      - helios_shard1:/app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  shard-2:
+    build:
+      context: .
+      dockerfile: deployments/docker/Dockerfile
+    entrypoint: ["/app/helios-shard"]
+    environment:
+      HELIOS_DATABASE_URL: postgres://helios:helios@postgres:5432/helios?sslmode=disable
+      HELIOS_SHARD_ID: shard-2
+      HELIOS_SHARD_GRPC_HOST: 0.0.0.0
+      HELIOS_SHARD_GRPC_PORT: "9000"
+      HELIOS_CLUSTER_SHARDS: shard-0=shard-0:9000,shard-1=shard-1:9000,shard-2=shard-2:9000
+      HELIOS_CLUSTER_REPLICATION_FACTOR: "2"
+      HELIOS_INDEX_SNAPSHOT_PATH: /app/data/shard-2.json
+      HELIOS_SHARD_METRICS_PORT: "9100"
+    volumes:
+      - helios_shard2:/app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  api:
+    build:
+      context: .
+      dockerfile: deployments/docker/Dockerfile
+    environment:
+      HELIOS_DATABASE_URL: postgres://helios:helios@postgres:5432/helios?sslmode=disable
+      HELIOS_SERVER_HOST: 0.0.0.0
+      HELIOS_SERVER_PORT: "8080"
+      HELIOS_CLUSTER_ENABLED: "true"
+      HELIOS_CLUSTER_SHARDS: shard-0=shard-0:9000,shard-1=shard-1:9000,shard-2=shard-2:9000
+      HELIOS_CLUSTER_REPLICATION_FACTOR: "2"
+      HELIOS_INDEX_SNAPSHOT_PATH: /app/data/index.json
+      HELIOS_CACHE_ENABLED: "true"
+      HELIOS_CACHE_BACKEND: redis
+      HELIOS_CACHE_REDIS_URL: redis://redis:6379/0
+    ports:
+      - "8080:8080"
+    volumes:
+      - helios_index:/app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      shard-0:
+        condition: service_started
+      shard-1:
+        condition: service_started
+      shard-2:
+        condition: service_started
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  prometheus:
+    image: prom/prometheus:v3.2.1
+    volumes:
+      - ./deployments/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    depends_on:
+      - api
+      - shard-0
+      - shard-1
+      - shard-2
+
+  grafana:
+    image: grafana/grafana:11.5.2
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: helios
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ./deployments/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./deployments/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+
+volumes:
+  helios_pg:
+  helios_index:
+  helios_shard0:
+  helios_shard1:
+  helios_shard2:
